@@ -8,6 +8,23 @@
 
 **Tech Stack:** Chrome Extension MV3, Vanilla JS (no frameworks — extension popups are tiny), Jest for unit tests on pure logic functions, manual browser testing for extension behavior.
 
+**Color Scheme:** Orange (`#e8630a`) and grey gradient (`#555555` through `#bbbbbb`). These two are the only accent colors permitted — no red, blue, green, yellow, or other hues anywhere in the UI.
+
+| Role | Value |
+|---|---|
+| Primary accent | `#e8630a` |
+| Text – primary | `#222222` |
+| Text – secondary | `#555555` |
+| Text – muted | `#999999` |
+| Border / divider | `#bbbbbb` (light) / `#dddddd` (very light) |
+| Background – page | `#f5f5f5` |
+| Background – card | `#ffffff` |
+| Background – inset | `#f0f0f0` |
+| Hover on primary | `#cf5808` (darkened orange) |
+| Disabled | `#cccccc` |
+
+All interactive states (hover, focus, active) use either a darker/lighter shade of orange or a grey shift — never a different hue.
+
 ---
 
 ## Repo Structure
