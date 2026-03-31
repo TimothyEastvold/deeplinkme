@@ -94,7 +94,8 @@ try {
         }
         $scriptContent = $scriptLines -join "`n"
         $scriptContent | wsl.exe -d $distro -- bash -c "cat > /tmp/cc-launch.sh && chmod +x /tmp/cc-launch.sh"
-        "$(Get-Date) - Wrote launch script to /tmp/cc-launch.sh in $distro" | Out-File $logFile -Append
+        "$(Get-Date) - Wrote launch script to /tmp/cc-launch.sh in $distro (worktree: '$worktree')" | Out-File $logFile -Append
+        "--- launch script ---`n$scriptContent`n--- end ---" | Out-File $logFile -Append
 
         $weztermArgs = @(
             "start",
