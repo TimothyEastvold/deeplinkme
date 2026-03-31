@@ -26,3 +26,18 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   chrome.storage.session.set({ trigger: 'contextmenu' });
   chrome.action.openPopup();
 });
+
+chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
+  if (msg.type !== 'GITHUB_CONTEXT') return;
+  chrome.storage.session.set({
+    githubContext: {
+      content: msg.content,
+      slug: msg.slug,
+      pageType: msg.pageType
+    }
+  }).then(() => {
+    chrome.action.openPopup();
+    sendResponse({ ok: true });
+  });
+  return true; // keep message channel open for async response
+});
