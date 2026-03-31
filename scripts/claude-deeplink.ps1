@@ -67,22 +67,27 @@ try {
         }
 
         $escapedPath = $linuxPath -replace "'", "'\''"
-        $claudeCmd = "claude --dangerously-skip-permissions"
+
+        # Write the launch script to a temp file in the distro to avoid
+        # argument-splitting issues with &&, $(), and special chars through
+        # WezTerm -> wsl.exe -> bash -lc.
+        $scriptLines = @("cd '$escapedPath'")
         if ($prompt) {
-            # Base64-encode the prompt to safely pass arbitrary text (newlines, quotes, unicode)
-            # through WezTerm -> wsl.exe -> bash without escaping issues.
-            # In bash: decode with base64 -d, store in variable, pass to claude.
             $promptBytes = [System.Text.Encoding]::UTF8.GetBytes($prompt)
             $promptB64 = [System.Convert]::ToBase64String($promptBytes)
-            $claudeCmd += " `"`$( printf '%s' '$promptB64' | base64 -d )`""
+            $scriptLines += "_p=`$(printf '%s' '$promptB64' | base64 -d)"
+            $scriptLines += 'claude --dangerously-skip-permissions "$_p"'
+        } else {
+            $scriptLines += "claude --dangerously-skip-permissions"
         }
-
-        $bashCmd = "cd '$escapedPath' && $claudeCmd"
+        $scriptContent = $scriptLines -join "`n"
+        $scriptContent | wsl.exe -d $distro -- bash -c "cat > /tmp/cc-launch.sh && chmod +x /tmp/cc-launch.sh"
+        "$(Get-Date) - Wrote launch script to /tmp/cc-launch.sh in $distro" | Out-File $logFile -Append
 
         $weztermArgs = @(
             "start",
             "--always-new-process",
-            "--", "wsl.exe", "-d", $distro, "--", "bash", "-lc", $bashCmd
+            "--", "wsl.exe", "-d", $distro, "--", "bash", "-l", "/tmp/cc-launch.sh"
         )
     } else {
         # Windows mode: launch claude directly with --cwd
