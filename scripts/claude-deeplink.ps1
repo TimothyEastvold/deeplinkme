@@ -78,9 +78,7 @@ try {
         $scriptLines = @("cd '$escapedPath'")
         if ($worktree) {
             $escapedWorktree = $worktree -replace "'", "'\''"
-            $scriptLines += "REPO_PARENT=`$(dirname `"`$(pwd)`")"
-            $scriptLines += "REPO_NAME=`$(basename `"`$(pwd)`")"
-            $scriptLines += "WORKTREE_PATH=`"`$REPO_PARENT/`${REPO_NAME}-$escapedWorktree`""
+            $scriptLines += "WORKTREE_PATH=`"`$(pwd)/.worktrees/$escapedWorktree`""
             $scriptLines += "git worktree add `"`$WORKTREE_PATH`" -b '$escapedWorktree' || git worktree add `"`$WORKTREE_PATH`" '$escapedWorktree' || true"
             $scriptLines += "if [ ! -d `"`$WORKTREE_PATH`" ]; then echo `"ERROR: could not create worktree at `$WORKTREE_PATH`"; read -p `"Press enter to close`"; exit 1; fi"
             $scriptLines += "cd `"`$WORKTREE_PATH`""
