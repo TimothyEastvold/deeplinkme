@@ -8,7 +8,7 @@
   <div id="app">
     <header>
       <span class="title">Claude Code</span>
-      <a href="settings.html" target="_blank" id="settings-btn" title="Settings">⚙</a>
+      <a href="settings.html" target="_blank" id="settings-btn" title="Settings" aria-label="Settings">⚙</a>
     </header>
 
     <section id="context-section">
@@ -45,13 +45,13 @@
 
     <section id="target-section">
       <div class="field-row">
-        <label>Distro</label>
+        <label for="distro-select">Distro</label>
         <select id="distro-select">
           <option value="">(none — Windows default)</option>
         </select>
       </div>
       <div class="field-row">
-        <label>Path</label>
+        <label for="path-select">Path</label>
         <select id="path-select">
           <option value="">(default)</option>
         </select>
