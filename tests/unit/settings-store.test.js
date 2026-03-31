@@ -27,3 +27,15 @@ test('parseSettings fills missing keys with defaults', () => {
   expect(result.systemPrompt).toBe('');
   expect(result.distros).toEqual([]);
 });
+
+test('validateDistro accepts distro with worktreeDefault true', () => {
+  expect(validateDistro({ name: 'dev', paths: ['/home'], worktreeDefault: true })).toBe(true);
+});
+
+test('validateDistro accepts distro without worktreeDefault (backwards compat)', () => {
+  expect(validateDistro({ name: 'dev', paths: ['/home'] })).toBe(true);
+});
+
+test('validateDistro rejects distro with non-boolean worktreeDefault', () => {
+  expect(validateDistro({ name: 'dev', paths: ['/home'], worktreeDefault: 'yes' })).toBe(false);
+});

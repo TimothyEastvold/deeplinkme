@@ -12,31 +12,38 @@
   "distros": [
     {
       "name": "amsoil-dlp",
-      "paths": ["/home/dev/repos/amsoil-dlp"]
+      "paths": ["/home/dev/repos/amsoil-dlp"],
+      "worktreeDefault": false
     },
     {
       "name": "walkinlab-qa",
-      "paths": ["/home/dev/repos/walkinlab-cakephp-4"]
+      "paths": ["/home/dev/repos/walkinlab-cakephp-4"],
+      "worktreeDefault": false
     },
     {
       "name": "midas-qa",
-      "paths": ["/home/dev/repos/midas"]
+      "paths": ["/home/dev/repos/midas"],
+      "worktreeDefault": false
     },
     {
       "name": "bala-dev",
-      "paths": ["/home/dev/repos/bala"]
+      "paths": ["/home/dev/repos/bala"],
+      "worktreeDefault": false
     },
     {
       "name": "tinkertime-dev",
-      "paths": ["/home/dev/repos/tinkertime"]
+      "paths": ["/home/dev/repos/tinkertime"],
+      "worktreeDefault": false
     },
     {
       "name": "drafterly-dev",
-      "paths": ["/home/dev/repos/drafterly"]
+      "paths": ["/home/dev/repos/drafterly"],
+      "worktreeDefault": false
     },
     {
       "name": "creative-manifest-engine",
-      "paths": ["/home/dev/repos/creative-manifest-engine"]
+      "paths": ["/home/dev/repos/creative-manifest-engine"],
+      "worktreeDefault": false
     },
     {
       "name": "playground",
@@ -56,7 +63,8 @@
         "/home/dev/repos/probe",
         "/home/dev/repos/webMCP",
         "/home/dev/repos/webhook-channel"
-      ]
+      ],
+      "worktreeDefault": false
     }
   ]
 }

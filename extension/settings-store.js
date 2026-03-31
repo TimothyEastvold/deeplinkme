@@ -10,13 +10,11 @@ function parseSettings(raw) {
 }
 
 function validateDistro(distro) {
-  return (
-    typeof distro.name === 'string' &&
-    distro.name.trim().length > 0 &&
-    Array.isArray(distro.paths) &&
-    distro.paths.length > 0 &&
-    distro.paths.every(p => typeof p === 'string' && p.trim().length > 0)
-  );
+  if (typeof distro.name !== 'string' || distro.name.trim().length === 0) return false;
+  if (!Array.isArray(distro.paths) || distro.paths.length === 0) return false;
+  if (!distro.paths.every(p => typeof p === 'string' && p.trim().length > 0)) return false;
+  if ('worktreeDefault' in distro && typeof distro.worktreeDefault !== 'boolean') return false;
+  return true;
 }
 
 // Node/Jest compatibility — not available in browser but harmless check
