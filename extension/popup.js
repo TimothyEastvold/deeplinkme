@@ -5,6 +5,7 @@ const PURE_MD_BASE = 'https://pure.md/';
 let settings = { systemPrompt: '', distros: [], urlRules: [] };
 let selectionData = { text: '', imageUrls: [] };
 let fullPageMarkdown = '';
+let githubContent = '';
 let fullPageFetchController = null;
 
 async function init() {
@@ -27,6 +28,7 @@ async function init() {
     await chrome.storage.session.remove('trigger');
   }
   await captureSelection();
+  await loadGithubContext();
 
   document.getElementById('include-fullpage').addEventListener('change', onFullPageToggle);
   document.getElementById('distro-select').addEventListener('change', onDistroChange);
@@ -111,6 +113,36 @@ async function captureSelection() {
   }
 }
 
+async function loadGithubContext() {
+  const session = await chrome.storage.session.get('githubContext');
+  if (!session.githubContext) return;
+
+  const { content, slug, pageType } = session.githubContext;
+  await chrome.storage.session.remove('githubContext');
+
+  githubContent = content;
+
+  const label = pageType === 'PR' ? 'GitHub PR' : 'GitHub Issue';
+  document.getElementById('github-context-row').classList.remove('hidden');
+  document.getElementById('github-context-summary').textContent =
+    `${label} (~${Math.round(content.length / 1000)}k chars — ferried as file)`;
+  document.getElementById('github-context-preview').textContent =
+    content.slice(0, 500) + (content.length > 500 ? '\n…' : '');
+
+  // Apply worktreeDefault for the auto-selected distro
+  const distroName = document.getElementById('distro-select').value;
+  const distro = settings.distros.find(d => d.name === distroName);
+  if (distro && distro.worktreeDefault) {
+    document.getElementById('use-worktree').checked = true;
+    document.getElementById('worktree-row').classList.remove('hidden');
+  }
+
+  // Pre-fill worktree name with slugified title
+  if (slug) {
+    document.getElementById('worktree-name').value = slug;
+  }
+}
+
 async function onFullPageToggle(e) {
   const checked = e.target.checked;
   document.getElementById('fullpage-row').classList.toggle('hidden', !checked);
@@ -180,6 +212,9 @@ function buildFinalPrompt(userPrompt) {
   if (fullPageMarkdown) {
     parts.push('## Context file\n\nContext has been written to `/tmp/cc-context.md`');
   }
+  if (githubContent) {
+    parts.push('## Context file\n\nContext has been written to `/tmp/cc-context.md`');
+  }
   if (userPrompt) parts.push(userPrompt);
   return parts.join('\n\n---\n\n');
 }
@@ -204,7 +239,7 @@ async function onLaunch() {
     ? document.getElementById('worktree-name').value.trim()
     : '';
   const finalPrompt = buildFinalPrompt(userPrompt);
-  const content = fullPageMarkdown;
+  const content = fullPageMarkdown || githubContent;
 
   const url = assembleRelayUrl({ prompt: finalPrompt, distro, path, content, worktree }, RELAY_URL);
   await chrome.tabs.create({ url });
