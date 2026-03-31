@@ -44,10 +44,13 @@ function populateDistros() {
 function onDistroChange() {
   const distroName = document.getElementById('distro-select').value;
   const pathSel = document.getElementById('path-select');
-  pathSel.innerHTML = '<option value="">(default)</option>';
-  if (!distroName) return;
+  if (!distroName) {
+    pathSel.innerHTML = '<option value="">(default)</option>';
+    return;
+  }
   const distro = settings.distros.find(d => d.name === distroName);
   if (!distro) return;
+  pathSel.innerHTML = '';
   distro.paths.forEach(p => {
     const opt = document.createElement('option');
     opt.value = p;
