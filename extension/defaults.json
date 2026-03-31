@@ -1,0 +1,53 @@
+{
+  "systemPrompt": "",
+  "distros": [
+    {
+      "name": "amsoil-dlp",
+      "paths": ["/home/dev/repos/amsoil-dlp"]
+    },
+    {
+      "name": "walkinlab-qa",
+      "paths": ["/home/dev/repos/walkinlab-cakephp-4"]
+    },
+    {
+      "name": "midas-qa",
+      "paths": ["/home/dev/repos/midas"]
+    },
+    {
+      "name": "bala-dev",
+      "paths": ["/home/dev/repos/bala"]
+    },
+    {
+      "name": "tinkertime-dev",
+      "paths": ["/home/dev/repos/tinkertime"]
+    },
+    {
+      "name": "drafterly-dev",
+      "paths": ["/home/dev/repos/drafterly"]
+    },
+    {
+      "name": "creative-manifest-engine",
+      "paths": ["/home/dev/repos/creative-manifest-engine"]
+    },
+    {
+      "name": "playground",
+      "paths": [
+        "/home/dev/repos/UptimeFlare",
+        "/home/dev/repos/acdev-cc-marketplace",
+        "/home/dev/repos/arti-factory",
+        "/home/dev/repos/coolify-lxc-control",
+        "/home/dev/repos/daily-vitals",
+        "/home/dev/repos/deeplinkme",
+        "/home/dev/repos/github-training",
+        "/home/dev/repos/gittyup",
+        "/home/dev/repos/gittyup-analysis-tools",
+        "/home/dev/repos/halvorlines",
+        "/home/dev/repos/isgs",
+        "/home/dev/repos/playground",
+        "/home/dev/repos/probe",
+        "/home/dev/repos/webMCP",
+        "/home/dev/repos/webhook-channel"
+      ]
+    }
+  ]
+}
