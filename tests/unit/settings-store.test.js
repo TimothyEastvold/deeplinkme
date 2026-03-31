@@ -18,6 +18,10 @@ test('validateDistro accepts valid distro', () => {
   expect(validateDistro({ name: 'playground', paths: ['/home/dev/repos'] })).toBe(true);
 });
 
+test('validateDistro rejects distro with blank path entries', () => {
+  expect(validateDistro({ name: 'my-distro', paths: [''] })).toBe(false);
+});
+
 test('parseSettings fills missing keys with defaults', () => {
   const result = parseSettings({ distros: [] });
   expect(result.systemPrompt).toBe('');

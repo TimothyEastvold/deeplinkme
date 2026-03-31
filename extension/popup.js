@@ -5,6 +5,7 @@ const PURE_MD_BASE = 'https://pure.md/';
 let settings = { systemPrompt: '', distros: [] };
 let selectionData = { text: '', imageUrls: [] };
 let fullPageMarkdown = '';
+let fullPageFetchController = null;
 
 async function init() {
   const stored = await chrome.storage.sync.get(['systemPrompt', 'distros']);
@@ -15,12 +16,12 @@ async function init() {
 
   populateDistros();
 
-  // Check if triggered from context menu
+  // Always capture selection — works whether opened via toolbar click or context menu
   const session = await chrome.storage.session.get('trigger');
   if (session.trigger === 'contextmenu') {
     await chrome.storage.session.remove('trigger');
-    await captureSelection();
   }
+  await captureSelection();
 
   document.getElementById('include-fullpage').addEventListener('change', onFullPageToggle);
   document.getElementById('distro-select').addEventListener('change', onDistroChange);
@@ -90,6 +91,10 @@ async function onFullPageToggle(e) {
 
   if (!checked) {
     fullPageMarkdown = '';
+    if (fullPageFetchController) {
+      fullPageFetchController.abort();
+      fullPageFetchController = null;
+    }
     return;
   }
 
@@ -99,20 +104,37 @@ async function onFullPageToggle(e) {
   document.getElementById('fullpage-loading').classList.remove('hidden');
   document.getElementById('launch-btn').disabled = true;
 
+  fullPageFetchController = new AbortController();
+
   try {
-    const res = await fetch(PURE_MD_BASE + tab.url);
+    const res = await fetch(PURE_MD_BASE + encodeURIComponent(tab.url), { signal: fullPageFetchController.signal });
     if (!res.ok) throw new Error(`pure.md returned ${res.status}`);
     fullPageMarkdown = await res.text();
+
+    const MAX_CONTENT_BYTES = 500_000; // ~500KB unencoded; base64 adds ~33%
+    if (fullPageMarkdown.length > MAX_CONTENT_BYTES) {
+      document.getElementById('fullpage-error').textContent =
+        `Page is too large to ferry (~${Math.round(fullPageMarkdown.length / 1000)}k chars). Try selecting a portion instead.`;
+      document.getElementById('fullpage-error').classList.remove('hidden');
+      document.getElementById('include-fullpage').checked = false;
+      fullPageMarkdown = '';
+      return; // skip the preview update below
+    }
 
     document.getElementById('fullpage-summary').textContent =
       `Page markdown (~${Math.round(fullPageMarkdown.length / 1000)}k chars — ferried as file)`;
     document.getElementById('fullpage-preview').textContent =
       fullPageMarkdown.slice(0, 500) + (fullPageMarkdown.length > 500 ? '\n…' : '');
   } catch (err) {
-    document.getElementById('fullpage-error').textContent = 'Could not fetch page: ' + err.message;
-    document.getElementById('fullpage-error').classList.remove('hidden');
-    document.getElementById('include-fullpage').checked = false;
+    if (err.name === 'AbortError') {
+      // User unchecked while fetch was in progress — silent
+    } else {
+      document.getElementById('fullpage-error').textContent = 'Could not fetch page: ' + err.message;
+      document.getElementById('fullpage-error').classList.remove('hidden');
+      document.getElementById('include-fullpage').checked = false;
+    }
     fullPageMarkdown = '';
+    fullPageFetchController = null;
   } finally {
     document.getElementById('fullpage-loading').classList.add('hidden');
     document.getElementById('launch-btn').disabled = false;

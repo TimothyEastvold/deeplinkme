@@ -14,7 +14,8 @@ function validateDistro(distro) {
     typeof distro.name === 'string' &&
     distro.name.trim().length > 0 &&
     Array.isArray(distro.paths) &&
-    distro.paths.length > 0
+    distro.paths.length > 0 &&
+    distro.paths.every(p => typeof p === 'string' && p.trim().length > 0)
   );
 }
 

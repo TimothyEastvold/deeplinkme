@@ -66,13 +66,14 @@ try {
             }
         }
 
+        $escapedPath = $linuxPath -replace "'", "'\''"
         $escapedPrompt = $prompt -replace "'", "'\''"
         $claudeCmd = "claude --dangerously-skip-permissions"
         if ($prompt) {
             $claudeCmd += " '$escapedPrompt'"
         }
 
-        $bashCmd = "cd '$linuxPath' && $claudeCmd"
+        $bashCmd = "cd '$escapedPath' && $claudeCmd"
 
         $weztermArgs = @(
             "start",
