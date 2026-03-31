@@ -62,7 +62,15 @@ async function captureSelection() {
     const result = await chrome.tabs.sendMessage(tab.id, { type: 'GET_SELECTION' });
     selectionData = result || { text: '', imageUrls: [] };
   } catch {
-    selectionData = { text: '', imageUrls: [] };
+    // Content script not yet injected in this tab (e.g. tab was open before extension install).
+    // Inject it programmatically, then retry.
+    try {
+      await chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] });
+      const result = await chrome.tabs.sendMessage(tab.id, { type: 'GET_SELECTION' });
+      selectionData = result || { text: '', imageUrls: [] };
+    } catch {
+      selectionData = { text: '', imageUrls: [] };
+    }
   }
 
   if (selectionData.text) {
