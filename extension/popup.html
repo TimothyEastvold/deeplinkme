@@ -56,6 +56,14 @@
           <option value="">(default)</option>
         </select>
       </div>
+      <label class="field-row worktree-toggle">
+        <span>Worktree</span>
+        <input type="checkbox" id="use-worktree">
+        <span class="toggle-label">Run in worktree</span>
+      </label>
+      <div id="worktree-row" class="hidden">
+        <input type="text" id="worktree-name" placeholder="branch-name (e.g. bala-flag-cleanup)">
+      </div>
     </section>
 
     <button id="launch-btn">Launch Claude Code →</button>

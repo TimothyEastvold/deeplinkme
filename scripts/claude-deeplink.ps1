@@ -20,6 +20,7 @@ try {
     $linuxPath = ""
     $prompt = ""
     $contentBase64 = ""
+    $worktree = ""
 
     if ($Uri -match '\?(.+)$') {
         $queryString = $Matches[1]
@@ -45,6 +46,9 @@ try {
         }
         if ($params.ContainsKey('content') -and $params['content']) {
             $contentBase64 = $params['content']
+        }
+        if ($params.ContainsKey('worktree') -and $params['worktree']) {
+            $worktree = $params['worktree']
         }
     }
 
@@ -72,6 +76,14 @@ try {
         # argument-splitting issues with &&, $(), and special chars through
         # WezTerm -> wsl.exe -> bash -lc.
         $scriptLines = @("cd '$escapedPath'")
+        if ($worktree) {
+            $escapedWorktree = $worktree -replace "'", "'\''"
+            $scriptLines += "REPO_PARENT=`$(dirname `"`$(pwd)`")"
+            $scriptLines += "REPO_NAME=`$(basename `"`$(pwd)`")"
+            $scriptLines += "WORKTREE_PATH=`"`$REPO_PARENT/`${REPO_NAME}-$escapedWorktree`""
+            $scriptLines += "git worktree add `"`$WORKTREE_PATH`" -b '$escapedWorktree' 2>/dev/null || git worktree add `"`$WORKTREE_PATH`" '$escapedWorktree' 2>/dev/null || true"
+            $scriptLines += "cd `"`$WORKTREE_PATH`""
+        }
         if ($prompt) {
             $promptBytes = [System.Text.Encoding]::UTF8.GetBytes($prompt)
             $promptB64 = [System.Convert]::ToBase64String($promptBytes)

@@ -193,6 +193,41 @@ textarea::placeholder {
   padding: 3px 4px;
 }
 
+/* Worktree */
+.worktree-toggle {
+  grid-template-columns: 48px auto 1fr;
+  cursor: pointer;
+  color: #555555;
+}
+
+.worktree-toggle .toggle-label {
+  color: #555555;
+}
+
+#worktree-row {
+  padding-left: 56px;
+}
+
+#worktree-name {
+  width: 100%;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 4px 8px;
+  font-size: 12px;
+  font-family: monospace;
+  color: #222222;
+  background: #ffffff;
+}
+
+#worktree-name:focus {
+  outline: 2px solid #e8630a;
+  outline-offset: -1px;
+}
+
+#worktree-name::placeholder {
+  color: #999999;
+}
+
 /* Launch button */
 #launch-btn {
   width: 100%;

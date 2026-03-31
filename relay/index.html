@@ -106,6 +106,7 @@
   var distro = params.get('distro') || '';
   var path = params.get('path') || '';
   var content = params.get('content') || '';
+  var worktree = params.get('worktree') || '';
 
   if (!q) {
     document.getElementById('content').innerHTML =
@@ -118,6 +119,7 @@
   if (distro) clUrl += '&distro=' + encodeURIComponent(distro);
   if (path) clUrl += '&path=' + encodeURIComponent(path);
   if (content) clUrl += '&content=' + encodeURIComponent(content);
+  if (worktree) clUrl += '&worktree=' + encodeURIComponent(worktree);
 
   // Build the display
   var targetLabel = distro

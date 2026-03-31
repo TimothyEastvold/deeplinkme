@@ -25,6 +25,7 @@ async function init() {
 
   document.getElementById('include-fullpage').addEventListener('change', onFullPageToggle);
   document.getElementById('distro-select').addEventListener('change', onDistroChange);
+  document.getElementById('use-worktree').addEventListener('change', onWorktreeToggle);
   document.getElementById('launch-btn').addEventListener('click', onLaunch);
   document.getElementById('prompt').focus();
 }
@@ -165,6 +166,13 @@ function buildFinalPrompt(userPrompt) {
   return parts.join('\n\n---\n\n');
 }
 
+function onWorktreeToggle(e) {
+  document.getElementById('worktree-row').classList.toggle('hidden', !e.target.checked);
+  if (e.target.checked) {
+    document.getElementById('worktree-name').focus();
+  }
+}
+
 async function onLaunch() {
   const userPrompt = document.getElementById('prompt').value.trim();
   if (!userPrompt && !selectionData.text && !fullPageMarkdown) {
@@ -174,10 +182,13 @@ async function onLaunch() {
 
   const distro = document.getElementById('distro-select').value;
   const path = document.getElementById('path-select').value;
+  const worktree = document.getElementById('use-worktree').checked
+    ? document.getElementById('worktree-name').value.trim()
+    : '';
   const finalPrompt = buildFinalPrompt(userPrompt);
   const content = fullPageMarkdown;
 
-  const url = assembleRelayUrl({ prompt: finalPrompt, distro, path, content }, RELAY_URL);
+  const url = assembleRelayUrl({ prompt: finalPrompt, distro, path, content, worktree }, RELAY_URL);
   await chrome.tabs.create({ url });
   window.close();
 }
