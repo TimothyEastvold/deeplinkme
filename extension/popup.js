@@ -228,7 +228,7 @@ function onWorktreeToggle(e) {
 
 async function onLaunch() {
   const userPrompt = document.getElementById('prompt').value.trim();
-  if (!userPrompt && !selectionData.text && !fullPageMarkdown) {
+  if (!userPrompt && !selectionData.text && !fullPageMarkdown && !githubContent) {
     document.getElementById('prompt').focus();
     return;
   }
