@@ -57,25 +57,17 @@ try {
     if ($distro) {
         # WSL mode: launch wsl shell inside WezTerm, cd to path, run claude
 
-        # If content was passed, write it to /tmp/cc-context.md in the distro
-        if ($contentBase64) {
-            $decodedBytes = [System.Convert]::FromBase64String($contentBase64)
-            $decodedText = [System.Text.Encoding]::UTF8.GetString($decodedBytes)
-            # Write via wsl stdin to avoid shell escaping issues with arbitrary content
-            $decodedText | wsl.exe -d $distro -- bash -c "cat > /tmp/cc-context.md"
-            if ($LASTEXITCODE -eq 0) {
-                "$(Get-Date) - Wrote context file to /tmp/cc-context.md in $distro" | Out-File $logFile -Append
-            } else {
-                "$(Get-Date) - WARNING: Failed to write context file (exit code $LASTEXITCODE)" | Out-File $logFile -Append
-            }
-        }
-
         $escapedPath = $linuxPath -replace "'", "'\''"
 
         # Write the launch script to a temp file in the distro to avoid
         # argument-splitting issues with &&, $(), and special chars through
         # WezTerm -> wsl.exe -> bash -lc.
         $scriptLines = @("cd '$escapedPath'")
+
+        # Embed content file writing in the launch script to avoid a second wsl.exe invocation
+        if ($contentBase64) {
+            $scriptLines += "printf '%s' '$contentBase64' | base64 -d > /tmp/cc-context.md"
+        }
         if ($worktree) {
             $escapedWorktree = $worktree -replace "'", "'\''"
             $scriptLines += "WORKTREE_PATH=`"`$(pwd)/.worktrees/$escapedWorktree`""
@@ -93,7 +85,7 @@ try {
         }
         $scriptContent = $scriptLines -join "`n"
         $scriptContent | wsl.exe -d $distro -- bash -c "cat > /tmp/cc-launch.sh && chmod +x /tmp/cc-launch.sh"
-        "$(Get-Date) - Wrote launch script to /tmp/cc-launch.sh in $distro (worktree: '$worktree')" | Out-File $logFile -Append
+        "$(Get-Date) - Wrote launch script to /tmp/cc-launch.sh in $distro (worktree: '$worktree', content: $([bool]$contentBase64))" | Out-File $logFile -Append
         "--- launch script ---`n$scriptContent`n--- end ---" | Out-File $logFile -Append
 
         $weztermArgs = @(
