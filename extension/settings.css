@@ -171,6 +171,83 @@ textarea:focus {
   background: rgba(232, 99, 10, 0.06);
 }
 
+/* URL Rules */
+
+#rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.rule-row {
+  display: flex;
+  flex-direction: row;
+  gap: 6px;
+  align-items: center;
+}
+
+.rule-pattern {
+  flex: 1;
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  padding: 5px 8px;
+  font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 12px;
+  color: #222222;
+  outline: none;
+}
+
+.rule-pattern:focus {
+  border-color: #e8630a;
+}
+
+.rule-distro {
+  border: 1px solid #dddddd;
+  border-radius: 4px;
+  background: #ffffff;
+  color: #222222;
+  font-size: 12px;
+  padding: 4px 6px;
+  outline: none;
+  max-width: 160px;
+}
+
+.rule-distro:focus {
+  border-color: #e8630a;
+}
+
+.remove-rule {
+  background: none;
+  border: none;
+  color: #999999;
+  cursor: pointer;
+  padding: 2px 6px;
+  font-size: 13px;
+  line-height: 1;
+  border-radius: 3px;
+}
+
+.remove-rule:hover {
+  color: #555555;
+}
+
+#add-rule-btn {
+  background: none;
+  color: #e8630a;
+  border: 1px dashed #e8630a;
+  border-radius: 4px;
+  padding: 4px 10px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  align-self: flex-start;
+}
+
+#add-rule-btn:hover {
+  background: rgba(232, 99, 10, 0.06);
+}
+
 /* Save row */
 
 #save-row {

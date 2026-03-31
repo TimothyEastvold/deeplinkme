@@ -2,19 +2,24 @@
 const RELAY_URL = 'https://timothyeastvold.github.io/cc/';
 const PURE_MD_BASE = 'https://pure.md/';
 
-let settings = { systemPrompt: '', distros: [] };
+let settings = { systemPrompt: '', distros: [], urlRules: [] };
 let selectionData = { text: '', imageUrls: [] };
 let fullPageMarkdown = '';
 let fullPageFetchController = null;
 
 async function init() {
-  const stored = await chrome.storage.sync.get(['systemPrompt', 'distros']);
+  const stored = await chrome.storage.sync.get(['systemPrompt', 'distros', 'urlRules']);
   settings = {
     systemPrompt: stored.systemPrompt || '',
-    distros: stored.distros || []
+    distros: stored.distros || [],
+    urlRules: stored.urlRules || []
   };
 
   populateDistros();
+
+  // Auto-select distro based on current tab URL
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  applyUrlRule(tab && tab.url);
 
   // Always capture selection — works whether opened via toolbar click or context menu
   const session = await chrome.storage.session.get('trigger');
@@ -57,6 +62,16 @@ function onDistroChange() {
     opt.textContent = p;
     pathSel.appendChild(opt);
   });
+}
+
+function applyUrlRule(tabUrl) {
+  if (!tabUrl || !settings.urlRules.length) return;
+  const lower = tabUrl.toLowerCase();
+  const rule = settings.urlRules.find(r => r.pattern && lower.includes(r.pattern.toLowerCase()));
+  if (!rule) return;
+  const sel = document.getElementById('distro-select');
+  sel.value = rule.distro;
+  onDistroChange();
 }
 
 async function captureSelection() {

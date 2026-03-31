@@ -1,5 +1,14 @@
 {
   "systemPrompt": "",
+  "urlRules": [
+    { "pattern": "aimclear.biz",                       "distro": "amsoil-dlp" },
+    { "pattern": "amsoil.aimclear.com",                "distro": "amsoil-dlp" },
+    { "pattern": "amsoil-dlp.acdev3.com",              "distro": "amsoil-dlp" },
+    { "pattern": "github.com/aimclear/amsoil-dlp",     "distro": "amsoil-dlp" },
+    { "pattern": "github.com/aimclear/walkinlab",      "distro": "walkinlab-qa" },
+    { "pattern": "walkinlab.com",                      "distro": "walkinlab-qa" },
+    { "pattern": "staging.walkinlab.com",              "distro": "walkinlab-qa" }
+  ],
   "distros": [
     {
       "name": "amsoil-dlp",

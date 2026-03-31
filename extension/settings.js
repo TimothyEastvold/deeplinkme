@@ -1,12 +1,16 @@
 // extension/settings.js
 let distros = [];
+let urlRules = [];
 
 async function init() {
-  const stored = await chrome.storage.sync.get(['systemPrompt', 'distros']);
+  const stored = await chrome.storage.sync.get(['systemPrompt', 'distros', 'urlRules']);
   document.getElementById('system-prompt').value = stored.systemPrompt || '';
   distros = stored.distros || [];
+  urlRules = stored.urlRules || [];
   renderDistros();
+  renderRules();
   document.getElementById('add-distro-btn').addEventListener('click', addDistro);
+  document.getElementById('add-rule-btn').addEventListener('click', addRule);
   document.getElementById('save-btn').addEventListener('click', save);
 }
 
@@ -70,12 +74,51 @@ function pathRow(di, pi, path) {
 function addDistro() {
   distros.push({ name: '', paths: [''] });
   renderDistros();
+  renderRules(); // refresh distro options in rule dropdowns
+}
+
+function renderRules() {
+  const container = document.getElementById('rules-list');
+  container.innerHTML = '';
+  urlRules.forEach((rule, ri) => {
+    const row = document.createElement('div');
+    row.className = 'rule-row';
+
+    const patternInput = document.createElement('input');
+    patternInput.className = 'rule-pattern';
+    patternInput.value = rule.pattern || '';
+    patternInput.placeholder = 'e.g. aimclear.biz or github.com/aimclear/amsoil-dlp';
+    patternInput.addEventListener('input', e => { urlRules[ri].pattern = e.target.value; });
+
+    const distroSel = document.createElement('select');
+    distroSel.className = 'rule-distro';
+    distroSel.innerHTML = '<option value="">(select distro)</option>' +
+      distros.map(d => `<option value="${escHtml(d.name)}"${d.name === rule.distro ? ' selected' : ''}>${escHtml(d.name)}</option>`).join('');
+    distroSel.addEventListener('change', e => { urlRules[ri].distro = e.target.value; });
+
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-rule';
+    removeBtn.setAttribute('aria-label', 'Remove rule');
+    removeBtn.textContent = '✕';
+    removeBtn.addEventListener('click', () => { urlRules.splice(ri, 1); renderRules(); });
+
+    row.appendChild(patternInput);
+    row.appendChild(distroSel);
+    row.appendChild(removeBtn);
+    container.appendChild(row);
+  });
+}
+
+function addRule() {
+  urlRules.push({ pattern: '', distro: '' });
+  renderRules();
 }
 
 async function save() {
   const systemPrompt = document.getElementById('system-prompt').value;
   const validDistros = distros.filter(d => validateDistro(d));
-  await chrome.storage.sync.set({ systemPrompt, distros: validDistros });
+  const validRules = urlRules.filter(r => r.pattern && r.pattern.trim() && r.distro);
+  await chrome.storage.sync.set({ systemPrompt, distros: validDistros, urlRules: validRules });
   const status = document.getElementById('save-status');
   status.textContent = 'Saved.';
   setTimeout(() => { status.textContent = ''; }, 2000);

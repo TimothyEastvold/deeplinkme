@@ -1,7 +1,7 @@
 // Pure functions for settings shape — no chrome.storage calls here
 
 function defaultSettings() {
-  return { systemPrompt: '', distros: [] };
+  return { systemPrompt: '', distros: [], urlRules: [] };
 }
 
 function parseSettings(raw) {
