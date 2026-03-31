@@ -36,7 +36,7 @@ function extractPageData() {
   const titleEl =
     document.querySelector('[data-testid="issue-title"]') ||
     document.querySelector('.js-issue-title');
-  const title = titleEl ? titleEl.textContent.trim() : document.title;
+  const title = titleEl ? titleEl.innerText.trim() : document.title;
 
   const bodyEl =
     document.querySelector('[data-testid="issue-body"] .js-comment-body') ||
