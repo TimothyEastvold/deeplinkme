@@ -10,6 +10,7 @@ chrome.runtime.onInstalled.addListener(() => {
 
 // Context menu click: store trigger source so popup auto-captures selection
 chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (!tab) return;
   chrome.storage.session.set({ trigger: 'contextmenu', tabId: tab.id });
   chrome.action.openPopup();
 });
