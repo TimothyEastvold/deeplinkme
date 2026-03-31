@@ -45,7 +45,7 @@ function extractPageData() {
   const description = bodyEl ? bodyEl.innerText.trim() : '';
 
   const comments = [];
-  const commentEls = document.querySelectorAll('.timeline-comment');
+  const commentEls = document.querySelectorAll('.timeline-comment-group');
   commentEls.forEach((el, i) => {
     if (i === 0) return; // skip OP — already captured as description
     const author =
@@ -118,8 +118,8 @@ if (typeof window !== 'undefined' && typeof chrome !== 'undefined') {
     injectStyles();
 
     const actionsContainer =
-      document.querySelector('.gh-header-actions') ||
-      document.querySelector('.js-sticky-header .gh-header-actions');
+      document.querySelector('[class*="prc-PageHeader-Actions-"]') ||
+      document.querySelector('.gh-header-actions');
     if (!actionsContainer) {
       console.warn('[deeplinkme] GitHub header actions container not found — button not injected');
       return;
