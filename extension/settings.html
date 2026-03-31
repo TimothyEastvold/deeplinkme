@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Claude Code Launcher — Settings</title>
+  <link rel="stylesheet" href="settings.css">
+</head>
+<body>
+  <div id="app">
+    <h1>Claude Code Launcher</h1>
+
+    <section>
+      <h2>System Prompt <span class="hint">(added silently to every launch)</span></h2>
+      <textarea id="system-prompt" rows="4" placeholder="Optional system-level instructions…"></textarea>
+    </section>
+
+    <section>
+      <h2>Distros &amp; Paths</h2>
+      <div id="distros-list"></div>
+      <button id="add-distro-btn" class="secondary">+ Add distro</button>
+    </section>
+
+    <div id="save-row">
+      <button id="save-btn">Save settings</button>
+      <span id="save-status"></span>
+    </div>
+  </div>
+  <script src="settings-store.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>
