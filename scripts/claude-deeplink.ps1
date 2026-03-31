@@ -67,10 +67,14 @@ try {
         }
 
         $escapedPath = $linuxPath -replace "'", "'\''"
-        $escapedPrompt = $prompt -replace "'", "'\''"
         $claudeCmd = "claude --dangerously-skip-permissions"
         if ($prompt) {
-            $claudeCmd += " '$escapedPrompt'"
+            # Base64-encode the prompt to safely pass arbitrary text (newlines, quotes, unicode)
+            # through WezTerm -> wsl.exe -> bash without escaping issues.
+            # In bash: decode with base64 -d, store in variable, pass to claude.
+            $promptBytes = [System.Text.Encoding]::UTF8.GetBytes($prompt)
+            $promptB64 = [System.Convert]::ToBase64String($promptBytes)
+            $claudeCmd += " `"`$( printf '%s' '$promptB64' | base64 -d )`""
         }
 
         $bashCmd = "cd '$escapedPath' && $claudeCmd"
