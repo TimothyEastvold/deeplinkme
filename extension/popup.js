@@ -16,9 +16,9 @@ async function init() {
   populateDistros();
 
   // Check if triggered from context menu
-  const session = await chrome.storage.session.get(['trigger', 'tabId']);
+  const session = await chrome.storage.session.get('trigger');
   if (session.trigger === 'contextmenu') {
-    await chrome.storage.session.remove(['trigger', 'tabId']);
+    await chrome.storage.session.remove('trigger');
     await captureSelection();
   }
 
@@ -74,6 +74,7 @@ async function captureSelection() {
   if (selectionData.imageUrls.length > 0) {
     document.getElementById('image-urls-row').classList.remove('hidden');
     const ul = document.getElementById('image-urls-list');
+    ul.innerHTML = '';
     selectionData.imageUrls.forEach(url => {
       const li = document.createElement('li');
       li.textContent = url;
