@@ -114,11 +114,23 @@ async function captureSelection() {
 }
 
 async function loadGithubContext() {
-  const session = await chrome.storage.session.get('githubContext');
+  let session;
+  try {
+    session = await chrome.storage.session.get('githubContext');
+  } catch (err) {
+    console.error('[deeplinkme] loadGithubContext: storage.get failed:', err.message);
+    return;
+  }
   if (!session.githubContext) return;
 
   const { content, slug, pageType } = session.githubContext;
-  await chrome.storage.session.remove('githubContext');
+
+  try {
+    await chrome.storage.session.remove('githubContext');
+  } catch (err) {
+    console.error('[deeplinkme] loadGithubContext: storage.remove failed:', err.message);
+    // Continue — data already read, removal failure is not fatal
+  }
 
   githubContent = content;
 
@@ -209,10 +221,7 @@ function buildFinalPrompt(userPrompt) {
   if (selectionData.imageUrls.length > 0) {
     parts.push('## Referenced images\n\n' + selectionData.imageUrls.map(u => '- ' + u).join('\n'));
   }
-  if (fullPageMarkdown) {
-    parts.push('## Context file\n\nContext has been written to `/tmp/cc-context.md`');
-  }
-  if (githubContent) {
+  if (fullPageMarkdown || githubContent) {
     parts.push('## Context file\n\nContext has been written to `/tmp/cc-context.md`');
   }
   if (userPrompt) parts.push(userPrompt);

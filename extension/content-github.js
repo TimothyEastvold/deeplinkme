@@ -120,7 +120,10 @@ if (typeof window !== 'undefined' && typeof chrome !== 'undefined') {
     const actionsContainer =
       document.querySelector('.gh-header-actions') ||
       document.querySelector('.js-sticky-header .gh-header-actions');
-    if (!actionsContainer) return;
+    if (!actionsContainer) {
+      console.warn('[deeplinkme] GitHub header actions container not found — button not injected');
+      return;
+    }
 
     const wrap = document.createElement('div');
     wrap.className = BTN_CLASS;
@@ -145,6 +148,8 @@ if (typeof window !== 'undefined' && typeof chrome !== 'undefined') {
           content,
           slug,
           pageType: data.type
+        }).catch(err => {
+          console.error('[deeplinkme] Failed to send GitHub context to background:', err.message);
         });
       });
     });
@@ -159,10 +164,14 @@ if (typeof window !== 'undefined' && typeof chrome !== 'undefined') {
   document.addEventListener('turbo:load', injectButton);
 
   // Fallback MutationObserver: re-inject if button is gone after DOM changes
+  let debounceTimer;
   const observer = new MutationObserver(() => {
-    if (isGitHubIssuePR() && !document.querySelector('.' + BTN_CLASS)) {
-      injectButton();
-    }
+    clearTimeout(debounceTimer);
+    debounceTimer = setTimeout(() => {
+      if (isGitHubIssuePR() && !document.querySelector('.' + BTN_CLASS)) {
+        injectButton();
+      }
+    }, 200);
   });
   observer.observe(document.body, { childList: true, subtree: true });
 }

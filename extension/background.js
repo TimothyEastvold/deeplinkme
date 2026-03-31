@@ -35,9 +35,16 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
       slug: msg.slug,
       pageType: msg.pageType
     }
-  }).then(() => {
-    chrome.action.openPopup();
+  }).then(async () => {
+    try {
+      await chrome.action.openPopup();
+    } catch (err) {
+      console.error('[deeplinkme] openPopup() failed:', err.message);
+    }
     sendResponse({ ok: true });
+  }).catch(err => {
+    console.error('[deeplinkme] Failed to store GitHub context:', err.message);
+    sendResponse({ ok: false, error: err.message });
   });
   return true; // keep message channel open for async response
 });
