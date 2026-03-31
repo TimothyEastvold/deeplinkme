@@ -29,6 +29,10 @@ function renderDistros() {
         ${distro.paths.map((p, pi) => pathRow(di, pi, p)).join('')}
       </div>
       <button class="add-path" data-di="${di}">+ Add path</button>
+      <label class="worktree-default-row">
+        <input type="checkbox" class="worktree-default" data-di="${di}"${distro.worktreeDefault ? ' checked' : ''}>
+        Worktree on by default
+      </label>
     `;
     container.appendChild(block);
   });
@@ -62,6 +66,11 @@ function renderDistros() {
       renderDistros();
     });
   });
+  container.querySelectorAll('.worktree-default').forEach(el => {
+    el.addEventListener('change', e => {
+      distros[+e.target.dataset.di].worktreeDefault = e.target.checked;
+    });
+  });
 }
 
 function pathRow(di, pi, path) {
@@ -72,7 +81,7 @@ function pathRow(di, pi, path) {
 }
 
 function addDistro() {
-  distros.push({ name: '', paths: [''] });
+  distros.push({ name: '', paths: [''], worktreeDefault: false });
   renderDistros();
   renderRules(); // refresh distro options in rule dropdowns
 }
