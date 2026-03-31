@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div id="app">
+    <header>
+      <span class="title">Claude Code</span>
+      <a href="settings.html" target="_blank" id="settings-btn" title="Settings">⚙</a>
+    </header>
+
+    <section id="context-section">
+      <div id="selection-row" class="context-row hidden">
+        <details>
+          <summary id="selection-summary">Selected text</summary>
+          <pre id="selection-preview"></pre>
+          <div id="image-urls-row" class="hidden">
+            <span class="label">Images:</span>
+            <ul id="image-urls-list"></ul>
+          </div>
+        </details>
+      </div>
+
+      <label id="fullpage-label" class="context-row">
+        <input type="checkbox" id="include-fullpage">
+        Include full page (pure.md)
+      </label>
+
+      <div id="fullpage-row" class="context-row hidden">
+        <details>
+          <summary id="fullpage-summary">Page markdown</summary>
+          <pre id="fullpage-preview"></pre>
+        </details>
+      </div>
+
+      <div id="fullpage-loading" class="hidden">Fetching page…</div>
+      <div id="fullpage-error" class="hidden error"></div>
+    </section>
+
+    <section>
+      <textarea id="prompt" placeholder="Type your prompt…" rows="4" autofocus></textarea>
+    </section>
+
+    <section id="target-section">
+      <div class="field-row">
+        <label>Distro</label>
+        <select id="distro-select">
+          <option value="">(none — Windows default)</option>
+        </select>
+      </div>
+      <div class="field-row">
+        <label>Path</label>
+        <select id="path-select">
+          <option value="">(default)</option>
+        </select>
+      </div>
+    </section>
+
+    <button id="launch-btn">Launch Claude Code →</button>
+  </div>
+  <script src="assemble-deeplink.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
