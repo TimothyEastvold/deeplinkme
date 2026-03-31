@@ -81,7 +81,8 @@ try {
             $scriptLines += "REPO_PARENT=`$(dirname `"`$(pwd)`")"
             $scriptLines += "REPO_NAME=`$(basename `"`$(pwd)`")"
             $scriptLines += "WORKTREE_PATH=`"`$REPO_PARENT/`${REPO_NAME}-$escapedWorktree`""
-            $scriptLines += "git worktree add `"`$WORKTREE_PATH`" -b '$escapedWorktree' 2>/dev/null || git worktree add `"`$WORKTREE_PATH`" '$escapedWorktree' 2>/dev/null || true"
+            $scriptLines += "git worktree add `"`$WORKTREE_PATH`" -b '$escapedWorktree' || git worktree add `"`$WORKTREE_PATH`" '$escapedWorktree' || true"
+            $scriptLines += "if [ ! -d `"`$WORKTREE_PATH`" ]; then echo `"ERROR: could not create worktree at `$WORKTREE_PATH`"; read -p `"Press enter to close`"; exit 1; fi"
             $scriptLines += "cd `"`$WORKTREE_PATH`""
         }
         if ($prompt) {
