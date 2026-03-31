@@ -19,6 +19,7 @@ try {
     $distro = ""
     $linuxPath = ""
     $prompt = ""
+    $contentBase64 = ""
 
     if ($Uri -match '\?(.+)$') {
         $queryString = $Matches[1]
@@ -42,7 +43,6 @@ try {
         if ($params.ContainsKey('q') -and $params['q']) {
             $prompt = $params['q']
         }
-        $contentBase64 = ""
         if ($params.ContainsKey('content') -and $params['content']) {
             $contentBase64 = $params['content']
         }
@@ -59,7 +59,11 @@ try {
             $decodedText = [System.Text.Encoding]::UTF8.GetString($decodedBytes)
             # Write via wsl stdin to avoid shell escaping issues with arbitrary content
             $decodedText | wsl.exe -d $distro -- bash -c "cat > /tmp/cc-context.md"
-            "$(Get-Date) - Wrote context file to /tmp/cc-context.md in $distro" | Out-File $logFile -Append
+            if ($LASTEXITCODE -eq 0) {
+                "$(Get-Date) - Wrote context file to /tmp/cc-context.md in $distro" | Out-File $logFile -Append
+            } else {
+                "$(Get-Date) - WARNING: Failed to write context file (exit code $LASTEXITCODE)" | Out-File $logFile -Append
+            }
         }
 
         $escapedPrompt = $prompt -replace "'", "'\''"
