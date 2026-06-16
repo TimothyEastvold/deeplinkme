@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Launch Claude Code</title>
+<title>Launch Deep Link</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -93,7 +93,7 @@
 </head>
 <body>
 <div class="card">
-  <h1>Launch Claude Code</h1>
+  <h1 id="title">Launch Deep Link</h1>
   <div id="content">
     <p>Reading parameters...</p>
   </div>
@@ -102,50 +102,76 @@
 <script>
 (function() {
   var params = new URLSearchParams(window.location.search);
-  var q = params.get('q') || '';
-  var distro = params.get('distro') || '';
-  var path = params.get('path') || '';
-  var content = params.get('content') || '';
-  var worktree = params.get('worktree') || '';
+  var app = (params.get('app') || 'claude').toLowerCase();
 
-  if (!q) {
-    document.getElementById('content').innerHTML =
-      '<p>No prompt provided. Add <code>?q=your+prompt</code> to the URL.</p>';
-    return;
+  var titleEl = document.getElementById('title');
+  var targetUrl = '';
+  var displayBody = '';
+  var btnLabel = '';
+
+  if (app === 'obsidian') {
+    // Obsidian mode: bounce https -> obsidian:// so the link is clickable
+    // from contexts (Google Calendar, etc.) that won't linkify custom schemes.
+    if (titleEl) titleEl.textContent = 'Open in Obsidian';
+    btnLabel = 'Open in Obsidian';
+
+    var vault = params.get('vault') || '';
+    var file = params.get('file') || '';
+    if (!vault || !file) {
+      document.getElementById('content').innerHTML =
+        '<p>Missing parameters. Add <code>?app=obsidian&amp;vault=...&amp;file=...</code> to the URL.</p>';
+      return;
+    }
+
+    targetUrl = 'obsidian://open?vault=' + encodeURIComponent(vault) +
+                '&file=' + encodeURIComponent(file);
+    displayBody = '<div class="meta">Target: <span>' + escHtml(file) +
+                  '</span> in vault <span>' + escHtml(vault) + '</span></div>';
+  } else {
+    // Claude Code mode (default, unchanged behavior)
+    if (titleEl) titleEl.textContent = 'Launch Claude Code';
+    btnLabel = 'Open in Claude Code';
+
+    var q = params.get('q') || '';
+    var distro = params.get('distro') || '';
+    var path = params.get('path') || '';
+    var content = params.get('content') || window.location.hash.slice(1) || '';
+    var worktree = params.get('worktree') || '';
+    var skipPermissions = params.get('skip_permissions') || '';
+
+    if (!q) {
+      document.getElementById('content').innerHTML =
+        '<p>No prompt provided. Add <code>?q=your+prompt</code> to the URL.</p>';
+      return;
+    }
+
+    targetUrl = 'claude-cli://open?q=' + encodeURIComponent(q);
+    if (distro) targetUrl += '&distro=' + encodeURIComponent(distro);
+    if (path) targetUrl += '&path=' + encodeURIComponent(path);
+    if (content) targetUrl += '&content=' + encodeURIComponent(content);
+    if (worktree) targetUrl += '&worktree=' + encodeURIComponent(worktree);
+    if (skipPermissions) targetUrl += '&skip_permissions=' + encodeURIComponent(skipPermissions);
+
+    var targetLabel = distro
+      ? '<span>' + escHtml(distro) + '</span> at <span>' + escHtml(path) + '</span>'
+      : 'Windows Notes (default)';
+    displayBody = '<div class="prompt">' + escHtml(q) + '</div>' +
+                  '<div class="meta">Target: ' + targetLabel + '</div>';
   }
 
-  // Build the claude-cli:// URL, preserving original encoding
-  var clUrl = 'claude-cli://open?q=' + encodeURIComponent(q);
-  if (distro) clUrl += '&distro=' + encodeURIComponent(distro);
-  if (path) clUrl += '&path=' + encodeURIComponent(path);
-  if (content) clUrl += '&content=' + encodeURIComponent(content);
-  if (worktree) clUrl += '&worktree=' + encodeURIComponent(worktree);
-
-  // Build the display
-  var targetLabel = distro
-    ? '<span>' + escHtml(distro) + '</span> at <span>' + escHtml(path) + '</span>'
-    : 'Windows Notes (default)';
-
-  // Build a pasteable command for the fallback
-  var cmd = 'claude';
-  if (q) cmd += ' "' + q.replace(/"/g, '\\"') + '"';
-  // Note: distro/path are handled by the protocol handler, not the CLI directly
-
   document.getElementById('content').innerHTML =
-    '<div class="prompt">' + escHtml(q) + '</div>' +
-    '<div class="meta">Target: ' + targetLabel + '</div>' +
-    '<a class="btn" id="launch" href="' + escAttr(clUrl) + '">Open in Claude Code</a>' +
+    displayBody +
+    '<a class="btn" id="launch" href="' + escAttr(targetUrl) + '">' + btnLabel + '</a>' +
     '<div id="status"></div>' +
     '<div class="fallback" style="margin-top:24px;">' +
       'If the button does not work, copy this URL and paste it in your browser address bar:' +
-      '<code id="raw-url">' + escHtml(clUrl) + '</code>' +
+      '<code id="raw-url">' + escHtml(targetUrl) + '</code>' +
       '<button class="copy-btn" onclick="copyUrl()">Copy URL</button>' +
     '</div>';
 
   // Auto-launch after a brief delay (gives the page time to render)
   setTimeout(function() {
-    window.location.href = clUrl;
-    // Show a status message after a moment
+    window.location.href = targetUrl;
     setTimeout(function() {
       var el = document.getElementById('status');
       if (el) el.textContent = 'Protocol handler triggered. If nothing opened, click the button above.';
